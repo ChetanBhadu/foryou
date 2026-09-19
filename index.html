@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kya Tumhe Hamari Yaad Aati Hai?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF6EF;
+    --blush:#FFD9E3;
+    --rose:#FF6F91;
+    --rose-deep:#E14E71;
+    --plum:#4A2E4C;
+    --lilac:#C9A9DD;
+    --line: rgba(74,46,76,0.14);
+    --card:#FFFFFF;
+  }
+  :root:not([data-theme="light"]){ color-scheme: light; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body{
+    font-family:'Quicksand', sans-serif;
+    color:var(--plum);
+    min-height:100%;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255,111,145,0.14), transparent 42%),
+      radial-gradient(circle at 92% 18%, rgba(201,169,221,0.22), transparent 45%),
+      radial-gradient(circle at 85% 92%, rgba(201,169,221,0.16), transparent 42%),
+      radial-gradient(circle at 8% 90%, rgba(255,217,227,0.5), transparent 45%),
+      var(--cream);
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  .float-heart{
+    position:fixed;
+    font-size:1.2rem;
+    opacity:.35;
+    pointer-events:none;
+    z-index:0;
+    animation: driftUp linear infinite;
+  }
+  @keyframes driftUp{
+    from{ transform: translateY(0) rotate(0deg); }
+    to{ transform: translateY(-120vh) rotate(30deg); }
+  }
+
+  .stage{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 30px 18px;
+  }
+
+  .wrap{ width:100%; max-width:520px; }
+
+  .lead{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .lead .script{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size: clamp(1.7rem, 6vw, 2.3rem);
+    color:var(--rose-deep);
+    line-height:1.1;
+  }
+  .lead .sub{
+    margin-top:6px;
+    font-size:.9rem;
+    color:#7A5F7D;
+  }
+
+  .tape{
+    position:absolute;
+    width:70px; height:26px;
+    background: rgba(201,169,221,0.55);
+    top:-13px;
+    left:50%;
+    transform: translateX(-50%) rotate(-3deg);
+    border-radius:2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  }
+
+  .card{
+    position:relative;
+    background:var(--card);
+    border-radius:22px;
+    padding: 34px 24px 28px;
+    box-shadow: 0 20px 50px rgba(74,46,76,0.14);
+    border:1.5px solid var(--line);
+  }
+
+  /* ---------------- GATE SCREEN ---------------- */
+  .screen{ display:none; }
+  .screen.show{ display:block; animation: pop .45s cubic-bezier(.2,.9,.25,1.1); }
+  @keyframes pop{ from{ opacity:0; transform:scale(.94); } to{ opacity:1; transform:scale(1); } }
+
+  .gate-q{
+    text-align:center;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:1.3rem;
+    line-height:1.4;
+    margin-bottom:24px;
+  }
+  .gate-row{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  button.pill{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:.95rem;
+    border-radius:999px;
+    padding:13px 24px;
+    cursor:pointer;
+    border:2px solid var(--rose);
+    background:transparent;
+    color:var(--rose-deep);
+    transition: transform .15s ease, background .2s ease;
+  }
+  button.pill:hover{ background: rgba(255,111,145,0.08); }
+  button.pill:active{ transform: scale(.96); }
+  button.pill:focus-visible{ outline:3px solid var(--lilac); outline-offset:2px; }
+  button.pill.solid{
+    background: linear-gradient(100deg, var(--rose), var(--rose-deep));
+    color:#fff;
+    border:none;
+  }
+
+  .gate-note{
+    margin-top:18px;
+    text-align:center;
+    font-size:.88rem;
+    color:#7A5F7D;
+    min-height:1.4em;
+  }
+
+  .start-row{
+    margin-top:20px;
+    text-align:center;
+  }
+
+  /* ---------------- QUIZ SCREEN ---------------- */
+  .progress{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .progress .p-heart{
+    font-size:1rem;
+    opacity:.3;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .progress .p-heart.active{ opacity:1; transform:scale(1.15); }
+  .progress .p-heart.done{ opacity:.85; }
+
+  .qnum{
+    text-align:center;
+    font-size:.78rem;
+    color:#9A7F9B;
+    margin-bottom:8px;
+  }
+
+  .question{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:1.22rem;
+    text-align:center;
+    line-height:1.4;
+    margin-bottom:22px;
+    min-height:2.8em;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+  }
+  .opt{
+    font-family:'Quicksand', sans-serif;
+    font-weight:600;
+    font-size:.96rem;
+    text-align:left;
+    padding:13px 16px;
+    border-radius:14px;
+    border:2px solid var(--line);
+    background:var(--cream);
+    color:var(--plum);
+    cursor:pointer;
+    transition: border-color .18s ease, background .18s ease, transform .12s ease;
+  }
+  .opt:hover{ border-color: var(--lilac); }
+  .opt:active{ transform: scale(.985); }
+  .opt:focus-visible{ outline:3px solid var(--lilac); outline-offset:2px; }
+  .opt.correct{ background:#E9F9EE; border-color:#6FCF97; color:#256B45; }
+  .opt.wrong{ background:#FDEBEC; border-color:#F1A6AC; color:#8C3A3F; }
+  .opt.disabled{ pointer-events:none; }
+  .opt.dim{ opacity:.55; }
+
+  .feedback{
+    margin-top:16px;
+    text-align:center;
+    font-size:.92rem;
+    font-weight:600;
+    min-height:1.4em;
+    opacity:0;
+    transition: opacity .3s ease;
+  }
+  .feedback.show{ opacity:1; }
+  .feedback.good{ color:#256B45; }
+  .feedback.bad{ color:#8C3A3F; }
+
+  .next-row{ margin-top:20px; text-align:center; }
+  button.next{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:.95rem;
+    border:none;
+    border-radius:999px;
+    padding:12px 28px;
+    background: linear-gradient(100deg, var(--rose), var(--rose-deep));
+    color:#fff;
+    cursor:pointer;
+    opacity:0;
+    transform:translateY(6px);
+    transition: opacity .3s ease, transform .3s ease;
+    box-shadow: 0 8px 18px rgba(225,78,113,0.3);
+  }
+  button.next.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  button.next:not(.show){ pointer-events:none; }
+  button.next:active{ transform: scale(.97); }
+  button.next:focus-visible{ outline:3px solid var(--lilac); outline-offset:2px; }
+
+  /* ---------------- LOVE QUESTION SCREEN ---------------- */
+  .love-title{
+    text-align:center;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:1.3rem;
+    margin-bottom:6px;
+  }
+  .love-hint{
+    text-align:center;
+    font-size:.82rem;
+    color:#9A7F9B;
+    margin-bottom:20px;
+    min-height:1.3em;
+  }
+  .love-box{
+    position:relative;
+    min-height:170px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  button.love-btn{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    border-radius:999px;
+    padding:16px 26px;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-yes{
+    background: linear-gradient(100deg, var(--rose), var(--rose-deep));
+    color:#fff;
+    box-shadow: 0 8px 18px rgba(225,78,113,0.3);
+  }
+  .btn-yes:active{ transform: scale(.96); }
+  .btn-yes:focus-visible{ outline:3px solid var(--lilac); outline-offset:2px; }
+  .btn-no{
+    background: var(--cream);
+    color:#7A5F7D;
+    border:2px solid var(--line);
+    transition: left .22s ease, top .22s ease, transform .15s ease;
+  }
+  .btn-no:focus-visible{ outline:3px solid var(--lilac); outline-offset:2px; }
+
+  .love-result{
+    display:none;
+    text-align:center;
+    margin-top:8px;
+  }
+  .love-result.show{ display:block; animation: pop .4s ease; }
+  .love-result .big{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:2rem;
+    color:var(--rose-deep);
+  }
+
+  /* ---------------- RESULT SCREEN ---------------- */
+  .score-badge{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:2.6rem;
+    color:var(--rose-deep);
+    line-height:1;
+    text-align:center;
+  }
+  .score-label{
+    font-size:.82rem;
+    color:#7A5F7D;
+    margin-top:4px;
+    margin-bottom:22px;
+    text-align:center;
+  }
+
+  .note-title{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size: clamp(1.7rem, 7vw, 2.3rem);
+    color:var(--plum);
+    text-align:center;
+    line-height:1.2;
+  }
+
+  .msg{
+    margin-top:16px;
+    font-size:.98rem;
+    line-height:1.75;
+    color:#5A425C;
+    max-width:400px;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+  }
+  .msg b{ color:var(--rose-deep); }
+
+  .keepsakes{
+    margin-top:24px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .keepsake{
+    background:var(--blush);
+    border-radius:12px;
+    padding:8px 12px;
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--rose-deep);
+  }
+
+  .again-row{ margin-top:26px; text-align:center; }
+  button.again{
+    font-family:'Quicksand', sans-serif;
+    font-weight:600;
+    font-size:.88rem;
+    border:2px solid var(--rose);
+    border-radius:999px;
+    padding:10px 20px;
+    background:transparent;
+    color:var(--rose-deep);
+    cursor:pointer;
+  }
+  button.again:hover{ background: rgba(255,111,145,0.08); }
+  button.again:focus-visible{ outline:3px solid var(--lilac); outline-offset:2px; }
+
+  .heart-burst{ position:fixed; z-index:50; pointer-events:none; font-size:1.1rem; }
+
+  .footer-note{
+    text-align:center;
+    margin-top:26px;
+    font-size:.74rem;
+    color:#9A7F9B;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001s !important; transition-duration:.001s !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="wrap">
+
+    <div class="lead">
+      <div class="script">Ek chhota sa sawaal... 💌</div>
+    </div>
+
+    <div class="card">
+      <div class="tape"></div>
+
+      <!-- GATE -->
+      <div class="screen show" id="gateScreen">
+        <div class="gate-q">Kya aapko hamari yaad aati hai?</div>
+        <div class="gate-row">
+          <button class="pill solid" id="gateYes">Haan, bohot 🥹</button>
+          <button class="pill" id="gateNo">Nahi 😏</button>
+        </div>
+        <div class="gate-note" id="gateNote"></div>
+        <div class="start-row" id="startRow" style="display:none;">
+          <button class="next show" id="startQuizBtn">Test shuru karo</button>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="screen" id="quizScreen">
+        <div class="progress" id="progress"></div>
+        <div class="qnum" id="qnum">Question 1 of 4</div>
+        <div class="question" id="questionText"></div>
+        <div class="options" id="optionsBox"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="next-row"><button class="next" id="nextBtn">Agla sawaal</button></div>
+      </div>
+
+      <!-- LOVE QUESTION -->
+      <div class="screen" id="loveScreen">
+        <div class="love-title">Ek aakhri, sabse zaroori sawaal 👇</div>
+        <div class="love-hint" id="loveHint">Do you love me 🤩 or not 😭</div>
+        <div class="love-box" id="loveBox">
+          <button class="love-btn btn-yes" id="loveYes">Yes 🤩</button>
+          <button class="love-btn btn-no" id="loveNo">No 😭</button>
+        </div>
+        <div class="love-result" id="loveResult">
+          <div class="big">Confirmed. She loves us. 💜</div>
+        </div>
+        <div class="next-row"><button class="next" id="toResultBtn">Result dekho</button></div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="screen" id="resultView">
+        <div class="score-badge" id="scoreBadge">4/4</div>
+        <div class="score-label" id="scoreLabel">Best Friend Level: Soulmate</div>
+
+        <div class="note-title">Test complete 💌</div>
+        <p class="msg">Itna sab pata hai tumhe hamare baare mein, aur ab toh ye bhi confirm ho gaya ki tum intelligent bhi ho (No button ne bhi try kiya 😆). 5 saal ho gaye is dosti ko aur abhi toh shuruaat hai. Ldte raho, aur please padte bhi rho jitna dil chahe — bas hamesha khush rehna. <b>Miss you, my best friend aka chukundar 💜</b></p>
+
+        <div class="keepsakes">
+          <span class="keepsake">5 saal ki dosti</span>
+          <span class="keepsake">Sleep expert</span>
+          <span class="keepsake">Loved, confirmed 🤩</span>
+        </div>
+
+        <div class="again-row">
+          <button class="again" id="againBtn">Sab kuch phir se karo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">banaya khaas tumhare liye, jaldi reply karna 🙂</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var questions = [
+    {
+      q: "Hum dono ki dosti sabse pehle kaise start hui thi?",
+      options: ["College/school mein saath the", "Common friend ne milwaya", "Social media pe baat shuru hui", "Kaam/tuition mein mile"],
+      correct: 1,
+      good: "Sahi jawab! Us common friend ko thank you bolna chahiye 😄",
+      bad: "Arre nahi, ek common friend ne milwaya tha hume!"
+    },
+    {
+      q: "Hum dono mein se zyada reels kaun bhejta hai?",
+      options: ["Main zyada bhejta hoon", "Wo zyada bhejti hai", "Dono barabar bhejte hain", "Bas reply karte hain, bhejte nahi"],
+      correct: 2,
+      good: "Bilkul sahi, dono ki equal contribution hai is addiction mein 📱",
+      bad: "Nope, dono barabar bhejte hain — koi peeche nahi hai!"
+    },
+    {
+      q: "Aapki super power kya hai?",
+      options: ["Sona 😂", "Kabhi late nahi hona", "Har jagah popular hona", "Kabhi na ladna"],
+      correct: 0,
+      good: "Haha sahi! Sona hi toh sabse badi super power hai 😴",
+      bad: "Galat! Sabko pata hai asli super power hai — Sona 😂"
+    },
+    {
+      q: "Hamari dosti ko kitne saal ho gaye?",
+      options: ["3 saal", "5 saal", "7 saal", "10 saal"],
+      correct: 1,
+      good: "Sahi! Poore 5 saal ho gaye 🎉",
+      bad: "Nahi yaar, poore 5 saal ho gaye hain hamari dosti ko."
+    }
+  ];
+
+  var current = 0;
+  var score = 0;
+  var answered = false;
+
+  var gateScreen = document.getElementById('gateScreen');
+  var gateNote = document.getElementById('gateNote');
+  var startRow = document.getElementById('startRow');
+  var quizScreen = document.getElementById('quizScreen');
+  var loveScreen = document.getElementById('loveScreen');
+  var resultView = document.getElementById('resultView');
+
+  var progressEl = document.getElementById('progress');
+  var qnumEl = document.getElementById('qnum');
+  var questionEl = document.getElementById('questionText');
+  var optionsEl = document.getElementById('optionsBox');
+  var feedbackEl = document.getElementById('feedback');
+  var nextBtn = document.getElementById('nextBtn');
+  var scoreBadge = document.getElementById('scoreBadge');
+  var scoreLabel = document.getElementById('scoreLabel');
+
+  function showScreen(el){
+    [gateScreen, quizScreen, loveScreen, resultView].forEach(function(s){ s.classList.remove('show'); });
+    el.classList.add('show');
+  }
+
+  /* ---- GATE ---- */
+  document.getElementById('gateYes').addEventListener('click', function(){
+    gateNote.textContent = 'Yehi sahi jawab tha! Ab dekhte hain kitna yaad hai tumhe hamare baare mein 💜';
+    startRow.style.display = 'block';
+  });
+  document.getElementById('gateNo').addEventListener('click', function(){
+    gateNote.textContent = 'Hmm... chalo dekhte hain test ke baad bhi yahi kehti ho 😏';
+    startRow.style.display = 'block';
+  });
+  document.getElementById('startQuizBtn').addEventListener('click', function(){
+    showScreen(quizScreen);
+    buildProgress();
+    renderQuestion();
+  });
+
+  /* ---- QUIZ ---- */
+  function buildProgress(){
+    progressEl.innerHTML = '';
+    questions.forEach(function(){
+      var s = document.createElement('span');
+      s.className = 'p-heart';
+      s.textContent = '♥';
+      progressEl.appendChild(s);
+    });
+  }
+
+  function updateProgress(){
+    var hearts = progressEl.querySelectorAll('.p-heart');
+    hearts.forEach(function(h, idx){
+      h.classList.remove('active','done');
+      if(idx < current) h.classList.add('done');
+      else if(idx === current) h.classList.add('active');
+    });
+  }
+
+  function renderQuestion(){
+    answered = false;
+    var item = questions[current];
+    qnumEl.textContent = 'Question ' + (current+1) + ' of ' + questions.length;
+    questionEl.textContent = item.q;
+    optionsEl.innerHTML = '';
+    feedbackEl.className = 'feedback';
+    feedbackEl.textContent = '';
+    nextBtn.classList.remove('show');
+    updateProgress();
+
+    item.options.forEach(function(optText, idx){
+      var btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.type = 'button';
+      btn.textContent = optText;
+      btn.addEventListener('click', function(){ selectOption(idx, btn); });
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function selectOption(idx, btnEl){
+    if(answered) return;
+    answered = true;
+    var item = questions[current];
+    var allBtns = optionsEl.querySelectorAll('.opt');
+    allBtns.forEach(function(b, i){
+      b.classList.add('disabled');
+      if(i === item.correct) b.classList.add('correct');
+      if(i !== item.correct) b.classList.add('dim');
+    });
+
+    if(idx === item.correct){
+      score++;
+      btnEl.classList.remove('dim');
+      feedbackEl.textContent = item.good;
+      feedbackEl.className = 'feedback show good';
+    } else {
+      btnEl.classList.remove('dim');
+      btnEl.classList.add('wrong');
+      feedbackEl.textContent = item.bad;
+      feedbackEl.className = 'feedback show bad';
+    }
+
+    nextBtn.textContent = (current === questions.length - 1) ? 'Ek aakhri sawaal' : 'Agla sawaal';
+    nextBtn.classList.add('show');
+  }
+
+  nextBtn.addEventListener('click', function(){
+    if(!answered) return;
+    current++;
+    if(current < questions.length){
+      renderQuestion();
+    } else {
+      showScreen(loveScreen);
+    }
+  });
+
+  /* ---- LOVE QUESTION (Yes-only, No runs away) ---- */
+  var loveBox = document.getElementById('loveBox');
+  var loveNoBtn = document.getElementById('loveNo');
+  var loveYesBtn = document.getElementById('loveYes');
+  var loveResult = document.getElementById('loveResult');
+  var loveHint = document.getElementById('loveHint');
+  var toResultBtn = document.getElementById('toResultBtn');
+  var dodgeCount = 0;
+  var noPositioned = false;
+
+  function dodgeNo(){
+    var boxRect = loveBox.getBoundingClientRect();
+    var btnRect = loveNoBtn.getBoundingClientRect();
+
+    if(!noPositioned){
+      var initLeft = btnRect.left - boxRect.left;
+      var initTop = btnRect.top - boxRect.top;
+      loveNoBtn.style.position = 'absolute';
+      loveNoBtn.style.left = initLeft + 'px';
+      loveNoBtn.style.top = initTop + 'px';
+      loveNoBtn.style.margin = '0';
+      noPositioned = true;
+      // force reflow before animating to new spot
+      loveNoBtn.offsetWidth;
+    }
+
+    var maxX = Math.max(0, loveBox.clientWidth - loveNoBtn.offsetWidth);
+    var maxY = Math.max(0, loveBox.clientHeight - loveNoBtn.offsetHeight);
+    var newX = Math.random() * maxX;
+    var newY = Math.random() * maxY;
+    loveNoBtn.style.left = newX + 'px';
+    loveNoBtn.style.top = newY + 'px';
+
+    dodgeCount++;
+    var hints = [
+      'Uh oh, wo bhag gaya 🏃',
+      'Pakad ke dikhao 😆',
+      'Ye button bhi jaanta hai sach kya hai 💜',
+      'Koshish jaari rakho... ya bas Yes daba do 🤩'
+    ];
+    loveHint.textContent = hints[Math.min(dodgeCount-1, hints.length-1)];
+  }
+
+  loveNoBtn.addEventListener('mouseenter', dodgeNo);
+  loveNoBtn.addEventListener('touchstart', function(e){ e.preventDefault(); dodgeNo(); }, {passive:false});
+  loveNoBtn.addEventListener('click', function(e){ e.preventDefault(); dodgeNo(); });
+  loveNoBtn.addEventListener('focus', dodgeNo);
+
+  loveYesBtn.addEventListener('click', function(){
+    loveResult.classList.add('show');
+    loveHint.textContent = 'Bas yehi sunna tha 🥹';
+    toResultBtn.classList.add('show');
+    burstHearts(18);
+  });
+
+  toResultBtn.addEventListener('click', function(){
+    showScreen(resultView);
+    scoreBadge.textContent = score + '/' + questions.length;
+    var label = 'Best Friend Level: ';
+    if(score === questions.length) label += 'Soulmate 💜';
+    else if(score >= questions.length - 1) label += 'Certified Bestie 🥰';
+    else label += 'Needs a refresher call 😏';
+    scoreLabel.textContent = label;
+    burstHearts(24);
+  });
+
+  /* ---- RESTART ---- */
+  document.getElementById('againBtn').addEventListener('click', function(){
+    current = 0; score = 0; dodgeCount = 0; noPositioned = false;
+    loveResult.classList.remove('show');
+    toResultBtn.classList.remove('show');
+    loveHint.textContent = 'Do you love me 🤩 or not 😭';
+    loveNoBtn.style.position = '';
+    loveNoBtn.style.left = '';
+    loveNoBtn.style.top = '';
+    gateNote.textContent = '';
+    startRow.style.display = 'none';
+    showScreen(gateScreen);
+  });
+
+  /* ---- effects ---- */
+  function burstHearts(count){
+    var emojis = ['💜','💕','✨','💗'];
+    for(var i=0;i<count;i++){
+      (function(){
+        var el = document.createElement('div');
+        el.className = 'heart-burst';
+        el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        el.style.left = (Math.random()*100) + 'vw';
+        el.style.top = '-24px';
+        document.body.appendChild(el);
+        var duration = 2200 + Math.random()*1400;
+        var drift = (Math.random()-0.5) * 140;
+        var start = null;
+        var fall = window.innerHeight + 60;
+        function frame(ts){
+          if(!start) start = ts;
+          var p = Math.min(1, (ts-start)/duration);
+          el.style.transform = 'translate(' + (p*drift) + 'px,' + (p*fall) + 'px) rotate(' + (p*180) + 'deg)';
+          el.style.opacity = String(1 - p*0.2);
+          if(p < 1) requestAnimationFrame(frame); else el.remove();
+        }
+        requestAnimationFrame(frame);
+      })();
+    }
+  }
+
+  function initFloatingHearts(){
+    var syms = ['♥','✦','♡'];
+    for(var i=0;i<8;i++){
+      var el = document.createElement('div');
+      el.className = 'float-heart';
+      el.textContent = syms[Math.floor(Math.random()*syms.length)];
+      el.style.left = (Math.random()*100) + 'vw';
+      el.style.bottom = (-10 - Math.random()*20) + 'vh';
+      el.style.animationDuration = (14 + Math.random()*10) + 's';
+      el.style.animationDelay = (Math.random()*10) + 's';
+      document.body.appendChild(el);
+    }
+  }
+
+  initFloatingHearts();
+})();
+</script>
+
+</body>
+</html>
